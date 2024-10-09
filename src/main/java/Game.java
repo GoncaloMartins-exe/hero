@@ -1,25 +1,20 @@
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.input.*;
+import com.googlecode.lanterna.screen.*;
+import com.googlecode.lanterna.terminal.*;
 
 import java.io.IOException;
 
 public class Game {
     private int x = 10;
     private int y = 10;
-    private Terminal terminal;
     private Screen screen;
 
     public Game() {
         try {
-            TerminalSize terminalSize = new TerminalSize(40, 20);
-            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory()
-                    .setInitialTerminalSize(terminalSize);
-            Terminal terminal = terminalFactory.createTerminal();
+            Terminal terminal = new DefaultTerminalFactory().createTerminal();
+            this.screen = new TerminalScreen(terminal);
             Screen screen = new TerminalScreen(terminal);
             screen.setCursorPosition(null); // we don't need a cursor
             screen.startScreen(); // screens must be started
@@ -52,11 +47,15 @@ public class Game {
 //___________________________________________________________________________
 
     public void run() {
-        draw();
         while (true) {
+            draw();
             try {
                 KeyStroke key = screen.readInput(); // Lê a entrada do teclado
-                System.out.println(key); // Imprime a tecla pressionada
+                if(key.getKeyType()==KeyType.EOF){
+                    break;
+                }
+                processKey(key);
+                draw();
             } catch (IOException e) {
                 e.printStackTrace();
             }
